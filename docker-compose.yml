@@ -3,7 +3,7 @@ version: '3.8'
 services:
   neo4j:
     image: neo4j:latest
-    container_name: neo4j_db
+    container_name: neo4j-db
     restart: always
     environment:
       - NEO4J_AUTH=neo4j/oscar123
@@ -12,15 +12,15 @@ services:
       - "7687:7687"  # Bolt para conexión desde API
     volumes:
       - neo4j_data:/data
-      - ./export:/var/lib/neo4j/import  # Para importar CSV
-      - ./import:/var/lib/neo4j/import
-
+      - ./import:/var/lib/neo4j/import  # Para importar CSV sin bloquear permisos
+      - ./export:/var/lib/neo4j/export  # Para guardar archivos generados
+    user: "7474:7474"  # Ejecutar el contenedor con el usuario de Neo4j
     networks:
       - app_network
 
   postgres:
     image: postgres:latest
-    container_name: postgres_db
+    container_name: postgres-db
     restart: always
     environment:
       POSTGRES_USER: user
@@ -35,7 +35,7 @@ services:
 
   backend:
     build: ./backend
-    container_name: express_backend
+    container_name: express-backend
     restart: always
     depends_on:
       - neo4j
@@ -47,7 +47,7 @@ services:
     ports:
       - "3000:3000"
     volumes:
-      - ./export:/mnt/export
+      - ./export:/mnt/export  # API guarda archivos transformados en export/
 
 volumes:
   neo4j_data:
@@ -56,3 +56,4 @@ volumes:
 networks:
   app_network:
     driver: bridge
+
