@@ -1,0 +1,13 @@
+# Archivos de dependencias
+node_modules/
+package-lock.json
+
+# Archivos de configuración
+.env
+
+# Archivos generados por Docker
+neo4j_data/
+pgdata/
+
+# Archivos de logs
+*.log
