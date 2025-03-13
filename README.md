@@ -14,8 +14,13 @@ sudo chmod -R 775 import export
 # Verificar permisos
 ls -ld import export
 
-#Para cargar la imagen
+#Para cargar datos
 LOAD CSV WITH HEADERS FROM 'file:///Dataset_A-Peliculas.csv' AS row
-CREATE (:Movie {title: row.title, year: toInteger(row.year), rating: toFloat(row.rating)});
+WITH row 
+WHERE row.nombre IS NOT NULL AND row.año_lanzamiento IS NOT NULL AND row.calificacion IS NOT NULL
+MERGE (m:Movie {nombre: row.nombre})
+SET m.año_lanzamiento = toInteger(row.año_lanzamiento),
+    m.calificacion = toFloat(row.calificacion);
+
 
 

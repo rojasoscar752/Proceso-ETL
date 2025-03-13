@@ -16,18 +16,18 @@ const driver = neo4j.driver(
 app.get("/api/extract", async (req, res) => {
     const session = driver.session();
     try {
-        const result = await session.run("MATCH (m:Movie) RETURN m.title AS title, m.year AS year, m.rating AS rating");
-        const movies = result.records.map(record => {
-            const title = record.get("title");
-            const yearField = record.get("year");
-            const ratingField = record.get("rating");
+        const result = await session.run(`
+            MATCH (m:Movie) 
+            RETURN m.nombre AS title, 
+                   m.año_lanzamiento AS year, 
+                   m.calificacion AS rating
+        `);
 
-            return {
-                title: title || "Desconocido",
-                year: yearField ? (yearField.low !== undefined ? yearField.low : yearField) : null,
-                rating: ratingField !== null ? ratingField : 0
-            };
-        });
+        const movies = result.records.map(record => ({
+            title: record.get("title") || "Desconocido",
+            year: record.get("year") ? (record.get("year").low !== undefined ? record.get("year").low : record.get("year")) : 0,
+            rating: record.get("rating") !== null ? record.get("rating") : 0
+        }));
 
         const transformedMovies = transformMovies(movies);
         await loadMovies(transformedMovies);
