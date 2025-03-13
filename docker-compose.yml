@@ -1,0 +1,58 @@
+version: '3.8'
+
+services:
+  neo4j:
+    image: neo4j:latest
+    container_name: neo4j_db
+    restart: always
+    environment:
+      - NEO4J_AUTH=neo4j/oscar123
+    ports:
+      - "7474:7474"  # Interfaz web de Neo4j
+      - "7687:7687"  # Bolt para conexión desde API
+    volumes:
+      - neo4j_data:/data
+      - ./export:/var/lib/neo4j/import  # Para importar CSV
+      - ./import:/var/lib/neo4j/import
+
+    networks:
+      - app_network
+
+  postgres:
+    image: postgres:latest
+    container_name: postgres_db
+    restart: always
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: etl_data
+    ports:
+      - "5432:5432"
+    networks:
+      - app_network
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+  backend:
+    build: ./backend
+    container_name: express_backend
+    restart: always
+    depends_on:
+      - neo4j
+      - postgres
+    env_file:
+      - backend/.env
+    networks:
+      - app_network
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./export:/mnt/export
+
+volumes:
+  neo4j_data:
+  pgdata:
+
+networks:
+  app_network:
+    driver: bridge

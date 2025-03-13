@@ -1,0 +1,16 @@
+{
+  "name": "etl-backend",
+  "version": "1.0.0",
+  "main": "index.js",
+  "dependencies": {
+    "express": "^4.17.1",
+    "neo4j-driver": "^5.7.0",
+    "pg": "^8.10.0",
+    "dotenv": "^16.0.3",
+    "fs": "0.0.1-security"
+  },
+  "scripts": {
+    "start": "node index.js"
+  }
+}
+
